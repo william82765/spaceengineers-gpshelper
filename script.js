@@ -1,54 +1,73 @@
-// script.js
-
 function distance(point1, point2) {
     const [x1, y1, z1] = point1.coordinates;
     const [x2, y2, z2] = point2.coordinates;
 
-    return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2);
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
 }
 
-function parsePoint(line) {
-    const parts = line.split(':');
+function parseGPSString(gpsString) {
+    const parts = gpsString.split(':');
     const name = parts[1].trim();
     const coordinates = parts.slice(2, 5).map(parseFloat);
     return { name, coordinates };
 }
 
-// GPS list input
-const inputText = `GPS:ast_z01 Me Ice :7153.08:170161.39:-79976.91:#FF75C9F1:
-GPS:ast_z02 Ag:12471.67:172579.13:-80453.65:#FF75C9F1:
-GPS:ast_z03 Ice:16866.28:174120.09:-73666.82:#FF75C9F1:`;
+function calculateDistances() {
+    const refPointStringInput = document.getElementById('refPointString');
+    const pointStringsInput = document.getElementById('pointStrings');
+    const distancesTableBody = document.querySelector('#distancesTable tbody');
+    const outputDiv = document.getElementById('output');
 
-// Split input into lines
-const inputLines = inputText.trim().split('\n');
+    const refPointString = refPointStringInput.value.trim();
+    const pointStrings = pointStringsInput.value.trim().split('\n');
 
-// Parse points
-const points = inputLines.map(parsePoint);
+    const refPoint = parseGPSString(refPointString);
+    const points = pointStrings.map(parseGPSString);
 
-// Calculate distances between each pair of points
-function calculateDistances(refPoint) {
-    if (refPoint !== null && refPoint !== undefined) {
-        const sortedList = points.map(point => {
-            const dist = Math.round(distance(refPoint, point) / 1000, 3);
-            return [point.name, dist];
-        }).sort((a, b) => a[1] - b[1]);
+    distancesTableBody.innerHTML = ''; // Clear previous rows
 
-        for (const point of sortedList) {
-            console.log(`${point[0]} ${point[1]}km`);
-        }
-    } else {
-        for (let i = 0; i < points.length; i++) {
-            for (let j = i + 1; j < points.length; j++) {
-                const point1 = points[i];
-                const point2 = points[j];
-                const dist = distance(point1, point2);
-                if (dist < 5000) {
-                    console.log(`Distance between ${point1.name} and ${point2.name}: ${dist}`);
-                }
-            }
-        }
-    }
+    /*onst outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = ''; // Clear previous output
+    outputDiv.innerHTML += `<p>Distance from ${refPoint.name} to each points</p>`;
+
+    points.forEach(point => {
+        const dist = Math.round(distance(refPoint, point) / 1000, 3);
+        outputDiv.innerHTML += `${point.name}: ${dist}km</p>`;
+    });*/
+    points.forEach(point => {
+        const dist = Math.round(distance(refPoint, point) / 1000, 3);
+        const row = `<tr><td>${point.name}</td><td>${dist}</td></tr>`;
+        distancesTableBody.innerHTML += row;
+    });
+    outputDiv.style.display = 'block';
 }
 
-// Example: Uncomment this line and provide input for testing
-// calculateDistances(parsePoint("GPS:ast_z01 Me Ice :7153.08:170161.39:-79976.91:#FF75C9F1:"));
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('test1')
+    const headers = document.querySelectorAll('#distancesTable th');
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => sortTable(header.cellIndex));
+    });
+});
+function sortTable(columnIndex) {
+    console.log('test')
+    const table = document.getElementById('distancesTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    const sortType = columnIndex === 0 ? 'alpha' : 'numeric';
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+
+        return sortType === 'alpha' ? aValue.localeCompare(bValue) : parseFloat(aValue) - parseFloat(bValue);
+    });
+
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+
+

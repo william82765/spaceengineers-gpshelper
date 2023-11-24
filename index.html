@@ -1,12 +1,46 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculate Distances</title>
+    <title>座標距離排序機</title>
+    <link rel="stylesheet" href="styles.css">
+
 </head>
+
 <body>
+    <h1>座標距離排序機</h1>
+
+    <div id="points">
+        <label>GPS清單: </label>
+        <textarea id="pointStrings" name="pointStrings" rows="10" cols="60" placeholder="貼上要被比較的GPS清單..."
+            required></textarea>
+        <!--button type="button" onclick="calculateDistances()">Calculate Distances</button-->
+    </div>
+    <div id="refpoint">
+        <form id="inputForm">
+            <label for="refPointString">比較參考基準座標: </label>
+            <textarea id="refPointString" name="refPointString" rows="2" cols="60" placeholder="貼上要與GPS清單計算距離的基準座標..."
+                required></textarea>
+
+            <button type="button" onclick="calculateDistances()">計算距離</button>
+        </form>
+    </div>
+
+    <div id="output" style="display: none;">
+        <table id="distancesTable">
+            <thead>
+                <tr>
+                    <th>座標名稱</th>
+                    <th>距離（公里）</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
